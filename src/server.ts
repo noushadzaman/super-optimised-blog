@@ -1,7 +1,8 @@
+import "dotenv/config";
 import app from "./app";
 import { prisma } from "./lib/prisma";
 
-const PORT = 5000;
+const PORT = 5000; // Restart trigger
 
 async function main() {
   try {
@@ -11,6 +12,8 @@ async function main() {
     //
     app.listen(PORT, () => {
       console.log(`Server is running on ${PORT}`);
+      console.log(`Email Service Configured for: ${process.env.APP_USER}`);
+      console.log(`Better Auth URL: ${process.env.BETTER_AUTH_URL}`);
     });
   } catch (error) {
     console.log("An error occured", error);
