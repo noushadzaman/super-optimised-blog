@@ -40,7 +40,7 @@ enum PostStatus {
 model Comment {
   id        String        @id @default(uuid())
   content   String        @db.Text
-  authodId  String // better auth
+  authorId  String // better auth
   postId    String
   post      Post          @relation(fields: [postId], references: [id])
   parentId  String?
@@ -48,10 +48,10 @@ model Comment {
   status    CommentStatus @default(APPROVED)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-  comments  Comment[]     @relation("commentreplies")
+  replies   Comment[]     @relation("commentreplies")
 
   @@index([postId])
-  @@index([authodId])
+  @@index([authorId])
   @@map("comments")
 }
 
