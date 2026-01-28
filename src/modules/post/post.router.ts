@@ -1,11 +1,19 @@
-import express from "express";
+import express, { Router } from "express";
 import { PostController } from "./post.controller";
 import auth, { UserRole } from "../../middlewares/auth";
 
 const router = express.Router();
 
 router.get("/", PostController.getAllPost);
-router.get("/:postId", PostController.getPostById);
-router.post("/", auth("USER" as UserRole), PostController.createPost);
 
-export const postRouter = router;
+router.get(
+  "/my-posts",
+  auth(UserRole.ADMIN, UserRole.USER),
+  PostController.getMyPosts,
+);
+
+router.get("/:postId", PostController.getPostById);
+
+router.post("/", auth(UserRole.USER), PostController.createPost);
+
+export const postRouter: Router = router;

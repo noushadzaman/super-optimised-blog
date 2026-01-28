@@ -26,6 +26,7 @@ model Post {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   comments   Comment[]
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
   @@map("posts")
@@ -73,6 +74,7 @@ model User {
   role          String?   @default("USER")
   phone         String?
   status        String?   @default("ACTIVE")
+  posts         Post[]
 
   @@unique([email])
   @@map("user")
