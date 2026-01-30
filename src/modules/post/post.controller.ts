@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { postServices } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helpers/paginationSortingHelpers";
+import { UserRole } from "../../middlewares/auth";
 
 const createPost = async (req: Request, res: Response) => {
   const user = req.user;
@@ -82,6 +83,20 @@ const getAllPost = async (req: Request, res: Response) => {
   }
 };
 
+const getStats = async (req: Request, res: Response) => {
+  try {
+    const result = await postServices.getStats();
+    res.status(200).json(result);
+  } catch (e) {
+    const errorMessage =
+      e instanceof Error ? e.message : "Stats fetched failed!";
+    res.status(400).json({
+      error: errorMessage,
+      details: e,
+    });
+  }
+};
+
 const getMyPosts = async (req: Request, res: Response) => {
   try {
     const user = req.user;
@@ -98,9 +113,59 @@ const getMyPosts = async (req: Request, res: Response) => {
   }
 };
 
+const updatePost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("u r not authorized");
+    }
+    const { postId } = req.params;
+    const isAdmin = user.role === UserRole.ADMIN;
+    const result = await postServices.updatePost(
+      postId as string,
+      req.body,
+      user.id,
+      isAdmin,
+    );
+    res.status(200).json(result);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : "post update failed!";
+    res.status(400).json({
+      error: errorMessage,
+      details: e,
+    });
+  }
+};
+
+const deletePost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("u r not authorized");
+    }
+    const { postId } = req.params;
+    const isAdmin = user.role === UserRole.ADMIN;
+    const result = await postServices.deletePost(
+      postId as string,
+      user.id,
+      isAdmin,
+    );
+    res.status(200).json(result);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : "post delete failed!";
+    res.status(400).json({
+      error: errorMessage,
+      details: e,
+    });
+  }
+};
+
 export const PostController = {
   createPost,
   getAllPost,
   getPostById,
+  getStats,
   getMyPosts,
+  updatePost,
+  deletePost,
 };
